@@ -568,6 +568,7 @@ class WebsiteSale(http.Controller):
 
         new_values['customer'] = True
         new_values['team_id'] = request.website.salesteam_id and request.website.salesteam_id.id
+        new_values['user_id'] = request.website.salesperson_id and request.website.salesperson_id.id
 
         lang = request.lang if request.lang in request.website.mapped('language_ids.code') else None
         if lang:
@@ -1064,3 +1065,20 @@ class WebsiteSale(http.Controller):
             states=[(st.id, st.name, st.code) for st in country.get_website_sale_states(mode=mode)],
             phone_code=country.phone_code
         )
+
+    @http.route(['/shop/update_carrier'], type='json', auth='public', methods=['POST'], website=True, csrf=False)
+    def update_eshop_carrier(self, **post):
+        results = {}
+        if hasattr(self, '_update_website_sale_delivery'):
+            results.update(self._update_website_sale_delivery(**post))
+
+        if hasattr(self, '_update_website_sale_coupon'):
+            results.update(self._update_website_sale_coupon(**post))
+
+        return results
+
+    def _format_amount(self, amount, currency):
+        fmt = "%.{0}f".format(currency.decimal_places)
+        lang = request.env['res.lang']._lang_get(request.env.context.get('lang') or 'en_US')
+        return lang.format(fmt, currency.round(amount), grouping=True, monetary=True)\
+            .replace(r' ', u'\N{NO-BREAK SPACE}').replace(r'-', u'-\N{ZERO WIDTH NO-BREAK SPACE}')
