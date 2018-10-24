@@ -211,8 +211,10 @@ var Chatter = Widget.extend(chat_mixin, {
         var msg_ids = record.fields['message_ids'];
         if (msg_ids.related) {
             var r_field = record.data[msg_ids.related[0]]
-            this.context.default_res_id = r_field.res_id;
-            this.context.default_model = r_field.model;
+            if (r_field) {
+                this.context.default_res_id = r_field.res_id;
+                this.context.default_model = r_field.model;
+            }
         }
         this.record = record;
         this.record_name = record.data.display_name;
