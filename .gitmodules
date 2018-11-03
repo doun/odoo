@@ -1,0 +1,3 @@
+[submodule "vat"]
+	path = dev/vat
+	url = git@gitlab.com:doun/vat.git
